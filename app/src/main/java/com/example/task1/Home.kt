@@ -1,15 +1,18 @@
 package com.example.task1
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,13 +37,44 @@ class Home : AppCompatActivity() , MovieClicked{
     private lateinit var catLinearLayout: LinearLayout
     private lateinit var mainPageImg : ImageView
     private lateinit var bookmarkImg : ImageView
-    lateinit var sharedPrefManager: SharedPreferences
-    lateinit var editor : SharedPreferences.Editor
-    val moviesList = mutableListOf<Movie>()
-    lateinit var movie : Movie
-    lateinit var bookmarkedMoviesList : MutableList<Movie>
-    lateinit var bookmarkedMovie : Movie
-    lateinit var emptyBookmarkedActivity: EmptyBookMarkedAdapter
+    private lateinit var sharedPrefManager: SharedPreferences
+    private lateinit var editor : SharedPreferences.Editor
+    private val moviesList = mutableListOf<Movie>()
+    private lateinit var movie : Movie
+    private lateinit var bookmarkedMoviesList : MutableList<Movie>
+    private lateinit var bookmarkedMovie : Movie
+    private lateinit var emptyBookmarkedActivity: EmptyBookMarkedAdapter
+
+
+
+    private val someActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val value = data?.getIntExtra("deletedID",-5)
+            val deletedFlag = data?.getBooleanExtra("deletedFlag",false)
+            Log.d("Value --------> $value","Value ---------> $value")
+            Log.d("deleted Flag --------> $deletedFlag","deleted Flag ---------> $deletedFlag")
+
+            if(value != null && deletedFlag == true){
+                val movie = getMovieData(value)
+                if(bookmarkedMoviesList.isNotEmpty()){
+                    bookmarkedMoviesList.remove(movie)
+                    myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
+                    recyclerView.adapter=myCustomAdapter
+                }
+
+                else {
+                    emptyBookmarkedActivity= EmptyBookMarkedAdapter()
+                    recyclerView.adapter=emptyBookmarkedActivity
+                }
+               // myCustomAdapter.notifyItemRemoved(index)
+                Log.d("Movie -->$movie","Movie ---> $movie")
+                //recyclerView.adapter=myCustomAdapter
+            }
+        }
+    }
+
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -57,12 +91,6 @@ class Home : AppCompatActivity() , MovieClicked{
         recyclerView.setHasFixedSize(true)
 
         getAllData()
-
-        bookmarkImg.setOnClickListener{
-            bookmarkImg.setImageResource(R.drawable.bookmark_enabled)
-            updateBookmarkList()
-        }
-
     }
 
     fun wrapViews(){
@@ -115,6 +143,7 @@ class Home : AppCompatActivity() , MovieClicked{
     }
 
     fun mainPageClicked(view: View) {
+        mainPageImg.alpha = 1f
         getAllData()
         bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
     }
@@ -139,8 +168,12 @@ class Home : AppCompatActivity() , MovieClicked{
         intent.putExtra("rating",rating)
         intent.putExtra("summary",summary)
         intent.putExtra("genres",ArrayList(genres))
-        startActivityForResult(intent,123)
+
+        someActivityResultLauncher.launch(intent)
+
     }
+
+
 
     private fun getMovieData(id : Int) : Movie?{
         var bookmarkedMovie: Movie? = null
@@ -175,9 +208,17 @@ class Home : AppCompatActivity() , MovieClicked{
             recyclerView.adapter=emptyBookmarkedActivity
         }
         else {
-            moviesList.clear()
+            //moviesList.clear()
             myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
             recyclerView.adapter=myCustomAdapter
         }
     }
+
+    fun bookmarkedImageClicked(view: View) {
+        mainPageImg.alpha = 0.5f
+        bookmarkImg.setImageResource(R.drawable.bookmark_enabled)
+        updateBookmarkList()
+    }
+
+
 }

@@ -26,17 +26,18 @@ import java.util.ArrayList
 
 class MovieActivity : AppCompatActivity() {
 
-    lateinit var movieImage : ImageView
-    lateinit var backImage : ImageView
-    lateinit var bookmarkImg : ImageView
-    lateinit var movieTitle : TextView
-    lateinit var rateText : TextView
-    lateinit var movieLength : TextView
-    lateinit var categoryLayout : LinearLayout
-    lateinit var movieLanguage : TextView
-    lateinit var summary : TextView
-    lateinit var sharedPrefManager: SharedPreferences
-    lateinit var editor : Editor
+    private lateinit var movieImage : ImageView
+    private lateinit var backImage : ImageView
+    private lateinit var bookmarkImg : ImageView
+    private lateinit var movieTitle : TextView
+    private lateinit var rateText : TextView
+    private lateinit var movieLength : TextView
+    private lateinit var categoryLayout : LinearLayout
+    private lateinit var movieLanguage : TextView
+    private lateinit var summary : TextView
+    private lateinit var sharedPrefManager: SharedPreferences
+    private lateinit var editor : Editor
+    private var deletedFlag = false
     val bookmarkedList = ArrayList<Movie>()
     var id : Int = -1
     var bookmarkFlag = 0
@@ -62,16 +63,20 @@ class MovieActivity : AppCompatActivity() {
         bookmarkImg.setOnClickListener {
             if (sharedPrefManager.getInt("$id",0) == 0) {
                 bookmarkImg.setImageResource(R.drawable.filled_bookmark)
+                deletedFlag=false
                 editor.putInt("$id",1).apply()
             } else {
                 bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
                // editor.putInt("$id",0).apply()
+                deletedFlag=true
                 editor.remove("$id").apply()
             }
         }
 
         backImage.setOnClickListener{
             val resultIntent = Intent()
+            resultIntent.putExtra("deletedID",id)
+            resultIntent.putExtra("deletedFlag",deletedFlag)
             setResult(Activity.RESULT_OK,resultIntent)
             finish()
         }
@@ -156,15 +161,12 @@ class MovieActivity : AppCompatActivity() {
         }
     }
 
-    /*override fun onBackPressed() {
-        super.onBackPressed()
-        for (key in sharedPrefManager.all.keys){
-            if(key.toIntOrNull() != null ){
-                Log.d("-------------123213-->${key.toInt()}","-------------123213-->${key.toInt()}")
-            }
-        }
+    override fun onBackPressed() {
         val resultIntent = Intent()
+        resultIntent.putExtra("deletedID",id)
+        resultIntent.putExtra("deletedFlag",deletedFlag)
         setResult(Activity.RESULT_OK,resultIntent)
         finish()
-    }*/
+        super.onBackPressed()
+    }
 }

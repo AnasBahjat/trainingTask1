@@ -57,7 +57,8 @@
             android:layout_height="35dp"
             android:layout_gravity="center"
             android:layout_marginStart="170dp"
-            android:src="@drawable/bookmark_light" />
+            android:onClick="bookmarkedImageClicked"
+            android:src="@drawable/bookmark_disabled" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
