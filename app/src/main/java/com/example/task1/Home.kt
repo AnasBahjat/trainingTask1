@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
@@ -28,6 +29,7 @@ import java.lang.Exception
 
 class Home : AppCompatActivity() , MovieClicked{
     private lateinit var recyclerView : RecyclerView
+    private lateinit var recyclerView2 : RecyclerView
     private lateinit var myCustomAdapter: CustomeAdapter
     private lateinit var myList :List<String>
     private val URL = "https://api.tvmaze.com/shows"
@@ -39,7 +41,7 @@ class Home : AppCompatActivity() , MovieClicked{
     private lateinit var bookmarkImg : ImageView
     private lateinit var sharedPrefManager: SharedPreferences
     private lateinit var editor : SharedPreferences.Editor
-    private val moviesList = mutableListOf<Movie>()
+    private var moviesList = mutableListOf<Movie>()
     private lateinit var movie : Movie
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var bookmarkedMovie : Movie
@@ -52,23 +54,22 @@ class Home : AppCompatActivity() , MovieClicked{
             val data: Intent? = result.data
             val value = data?.getIntExtra("deletedID",-5)
             val deletedFlag = data?.getBooleanExtra("deletedFlag",false)
-            Log.d("Value --------> $value","Value ---------> $value")
-            Log.d("deleted Flag --------> $deletedFlag","deleted Flag ---------> $deletedFlag")
 
             if(value != null && deletedFlag == true){
                 val movie = getMovieData(value)
-                if(bookmarkedMoviesList.isNotEmpty()){
+                Log.d("The length is ${bookmarkedMoviesList.size}","The length is ${bookmarkedMoviesList.size}")
+                if(bookmarkedMoviesList.size > 1){
+                    Log.d("The length is ${bookmarkedMoviesList[0].id}  ${bookmarkedMoviesList[0].name}","The length is ${bookmarkedMoviesList[0].id}  ${bookmarkedMoviesList[0].name}")
                     bookmarkedMoviesList.remove(movie)
                     myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
                     recyclerView.adapter=myCustomAdapter
                 }
-
                 else {
-                    emptyBookmarkedActivity= EmptyBookMarkedAdapter()
+                    Log.d("Empty !!!!!","Empty !!!!!")
+                    emptyBookmarkedActivity = EmptyBookMarkedAdapter()
                     recyclerView.adapter=emptyBookmarkedActivity
                 }
                // myCustomAdapter.notifyItemRemoved(index)
-                Log.d("Movie -->$movie","Movie ---> $movie")
                 //recyclerView.adapter=myCustomAdapter
             }
         }
@@ -88,8 +89,7 @@ class Home : AppCompatActivity() , MovieClicked{
         requestQueue= Volley.newRequestQueue(this)
         recyclerView.layoutManager=LinearLayoutManager(this)
 
-        recyclerView.setHasFixedSize(true)
-
+        bookmarkedMoviesList= mutableListOf<Movie>()
         getAllData()
     }
 
@@ -108,33 +108,10 @@ class Home : AppCompatActivity() , MovieClicked{
                 val movies = gson.fromJson(response, Array<Movie>::class.java).toList()
                 myCustomAdapter= CustomeAdapter(this,this,movies)
                 recyclerView.adapter=myCustomAdapter
-                val jsonArray = JSONArray(response)
-                for (i in 0 until jsonArray.length()){
-                    val json = jsonArray.getJSONObject(i)
-                    val id = json.getInt("id")
-                    val name = json.getString("name")
-                    val language=json.getString("language")
-                    val genres = json.getJSONArray("genres")
-                    val genresList = mutableListOf<String>()
-                    for(j in 0 until genres.length()){
-                        genresList.add(genres.getString(j))
-                    }
-                    val runtime = json.getInt("runtime")
-                    val rating = json.getJSONObject("rating").getDouble("average")
-
-                    val images = json.getJSONObject("image")
-                    val mediumImageUrl = images.getString("medium")
-                    val originalImageUrl = images.getString("original")
-                    val summary = json.getString("summary")
-
-
-
-                    movie = Movie(id,name,language,genresList,runtime,Rating(rating),Image(mediumImageUrl,originalImageUrl),summary)
-                    moviesList.add(movie)
-                }
+                moviesList= movies.toMutableList()
             }
             catch (e:Exception){
-
+                Toast.makeText(this,"error $e",Toast.LENGTH_LONG).show()
             }
         }) { error ->
             Toast.makeText(this, "Volley error $error", Toast.LENGTH_LONG).show()
@@ -144,7 +121,8 @@ class Home : AppCompatActivity() , MovieClicked{
 
     fun mainPageClicked(view: View) {
         mainPageImg.alpha = 1f
-        getAllData()
+        myCustomAdapter= CustomeAdapter(this,this,moviesList)
+        recyclerView.adapter=myCustomAdapter
         bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
     }
 
@@ -197,8 +175,10 @@ class Home : AppCompatActivity() , MovieClicked{
         bookmarkedMoviesList = mutableListOf()
         for (key in sharedPrefManager.all.keys){
             if(key.toIntOrNull() != null ){
+                Log.d("---------<><><> Key is $key","---------<><><> Key is $key")
                 val movie = getMovieData(key.toInt())
                 if (movie != null) {
+            //        Log.d("Movie id to be added is ${movie.id}","Movie id to be added is ${movie.id}\"")
                     bookmarkedMoviesList.add(movie)
                 }
             }
@@ -210,6 +190,7 @@ class Home : AppCompatActivity() , MovieClicked{
         else {
             //moviesList.clear()
             myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
+            Log.d("${bookmarkedMoviesList.size}","${bookmarkedMoviesList.size}")
             recyclerView.adapter=myCustomAdapter
         }
     }
