@@ -2,9 +2,12 @@ package com.example.task1
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,18 +16,12 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.google.gson.Gson
-import org.json.JSONArray
-import java.lang.Exception
+import retrofit2.Call
+import retrofit2.Callback
 
 
 class Home : AppCompatActivity() , MovieClicked{
@@ -34,7 +31,6 @@ class Home : AppCompatActivity() , MovieClicked{
     private lateinit var myList :List<String>
     private val URL = "https://api.tvmaze.com/shows"
     private lateinit var  myAdapter : CustomeAdapter
-    private lateinit var requestQueue : RequestQueue
     private lateinit var data : List<Movie>
     private lateinit var catLinearLayout: LinearLayout
     private lateinit var mainPageImg : ImageView
@@ -46,10 +42,11 @@ class Home : AppCompatActivity() , MovieClicked{
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var bookmarkedMovie : Movie
     private lateinit var emptyBookmarkedActivity: EmptyBookMarkedAdapter
+    lateinit var receiver : BroadcastReceiver
 
 
 
-    private val someActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    /*private val someActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val value = data?.getIntExtra("deletedID",-5)
@@ -57,27 +54,24 @@ class Home : AppCompatActivity() , MovieClicked{
 
             if(value != null && deletedFlag == true){
                 val movie = getMovieData(value)
-                Log.d("The length is ${bookmarkedMoviesList.size}","The length is ${bookmarkedMoviesList.size}")
                 if(bookmarkedMoviesList.size > 1){
-                    Log.d("The length is ${bookmarkedMoviesList[0].id}  ${bookmarkedMoviesList[0].name}","The length is ${bookmarkedMoviesList[0].id}  ${bookmarkedMoviesList[0].name}")
                     bookmarkedMoviesList.remove(movie)
                     myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
                     recyclerView.adapter=myCustomAdapter
                 }
                 else {
-                    Log.d("Empty !!!!!","Empty !!!!!")
                     emptyBookmarkedActivity = EmptyBookMarkedAdapter()
                     recyclerView.adapter=emptyBookmarkedActivity
                 }
-               // myCustomAdapter.notifyItemRemoved(index)
-                //recyclerView.adapter=myCustomAdapter
+
             }
         }
-    }
+    }*/
 
 
 
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,14 +80,20 @@ class Home : AppCompatActivity() , MovieClicked{
         wrapViews()
         recyclerView=findViewById(R.id.recView)
 
-        requestQueue= Volley.newRequestQueue(this)
         recyclerView.layoutManager=LinearLayoutManager(this)
 
         bookmarkedMoviesList= mutableListOf<Movie>()
+
+
+        val receiver  = BroadcastNotifyMovieDeleted()
+        registerReceiver(receiver , IntentFilter("deleteMovie"), RECEIVER_NOT_EXPORTED)
+
+
         getAllData()
     }
 
-    fun wrapViews(){
+
+    private fun wrapViews(){
         mainPageImg=findViewById(R.id.mainPage)
         bookmarkImg=findViewById(R.id.bookmarkActivityImg)
         sharedPrefManager=getSharedPreferences("taskSharedPreference", Context.MODE_PRIVATE)
@@ -101,23 +101,32 @@ class Home : AppCompatActivity() , MovieClicked{
     }
 
 
-    fun getAllData(){
-        val stringRequest = StringRequest(Request.Method.GET,URL, Response.Listener<String>{ response->
-            try {
-                val gson= Gson()
-                val movies = gson.fromJson(response, Array<Movie>::class.java).toList()
-                myCustomAdapter= CustomeAdapter(this,this,movies)
-                recyclerView.adapter=myCustomAdapter
-                moviesList= movies.toMutableList()
+
+    private fun getAllData(){
+
+        val call = ApiClient.apiService.getPostById()
+        call.enqueue(object : Callback<List<Movie>> {
+            override fun onResponse(call: Call<List<Movie>>, response: retrofit2.Response<List<Movie>>) {
+                if (response.isSuccessful) {
+                    val movies = response.body()
+
+                    if (movies != null) {
+                        myCustomAdapter= CustomeAdapter(this@Home,this@Home,movies)
+                        recyclerView.adapter=myCustomAdapter
+                        moviesList= movies.toMutableList()
+                    }
+                } else {
+                    Toast.makeText(this@Home,"Retrofit error reading data from API",Toast.LENGTH_LONG).show()
+                }
             }
-            catch (e:Exception){
-                Toast.makeText(this,"error $e",Toast.LENGTH_LONG).show()
+
+            override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
+                Toast.makeText(this@Home,"Retrofit error ${t.printStackTrace()}",Toast.LENGTH_LONG).show()
             }
-        }) { error ->
-            Toast.makeText(this, "Volley error $error", Toast.LENGTH_LONG).show()
-        }
-        requestQueue.add(stringRequest)
+
+        })
     }
+
 
     fun mainPageClicked(view: View) {
         mainPageImg.alpha = 1f
@@ -147,10 +156,10 @@ class Home : AppCompatActivity() , MovieClicked{
         intent.putExtra("summary",summary)
         intent.putExtra("genres",ArrayList(genres))
 
-        someActivityResultLauncher.launch(intent)
+       // someActivityResultLauncher.launch(intent)
+        startActivity(intent)
 
     }
-
 
 
     private fun getMovieData(id : Int) : Movie?{
@@ -171,26 +180,25 @@ class Home : AppCompatActivity() , MovieClicked{
         return bookmarkedMovie
     }
 
-    private fun updateBookmarkList(){
+     fun updateBookmarkList(){
         bookmarkedMoviesList = mutableListOf()
         for (key in sharedPrefManager.all.keys){
             if(key.toIntOrNull() != null ){
-                Log.d("---------<><><> Key is $key","---------<><><> Key is $key")
                 val movie = getMovieData(key.toInt())
                 if (movie != null) {
-            //        Log.d("Movie id to be added is ${movie.id}","Movie id to be added is ${movie.id}\"")
                     bookmarkedMoviesList.add(movie)
                 }
             }
         }
+
         if(bookmarkedMoviesList.isEmpty()){
             emptyBookmarkedActivity= EmptyBookMarkedAdapter()
             recyclerView.adapter=emptyBookmarkedActivity
         }
+
         else {
-            //moviesList.clear()
+
             myCustomAdapter=CustomeAdapter(this,this,bookmarkedMoviesList)
-            Log.d("${bookmarkedMoviesList.size}","${bookmarkedMoviesList.size}")
             recyclerView.adapter=myCustomAdapter
         }
     }
@@ -201,5 +209,17 @@ class Home : AppCompatActivity() , MovieClicked{
         updateBookmarkList()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
 
+    fun deleteMovie(movieID : Int){
+        val movieToDelete=getMovieData(movieID)
+        Log.d("The list data \n $bookmarkedMoviesList","The list data \n $bookmarkedMoviesList")
+        if(bookmarkedMoviesList.isNotEmpty()){
+            Log.d("--------------------------------->${bookmarkedMoviesList.size}","--------------------------------->${bookmarkedMoviesList.size}")
+            bookmarkedMoviesList.remove(movieToDelete)
+        }
+    }
 }

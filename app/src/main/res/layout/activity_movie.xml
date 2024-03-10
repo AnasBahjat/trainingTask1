@@ -15,7 +15,7 @@
         <ImageView
             android:id="@+id/movieImg"
             android:layout_width="match_parent"
-            android:layout_height="380dp"
+            android:layout_height="400dp"
             app:srcCompat="@drawable/loading_icon"
             android:scaleType="fitXY" />
 
@@ -31,7 +31,7 @@
             android:id="@+id/descLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="360dp"
+            android:layout_marginTop="380dp"
             android:background="@drawable/curved_layout">
 
             <TextView

@@ -54,7 +54,6 @@ class MovieActivity : AppCompatActivity() {
         wrapDataToViews()
 
 
-        Log.d("ID --------------> $id","ID -----------------> $id")
 
         if(sharedPrefManager.getInt("$id",0)==0){
             bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
@@ -68,24 +67,26 @@ class MovieActivity : AppCompatActivity() {
                 bookmarkImg.setImageResource(R.drawable.filled_bookmark)
                 deletedFlag=false
                 editor.putInt("$id",1).apply()
-                Log.d("ID --------------> $id Bookmarked","ID -----------------> $id Bookmarked")
 
             } else {
                 bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
                // editor.putInt("$id",0).apply()
-                deletedFlag=true
+               // deletedFlag=true
                 editor.remove("$id").apply()
-                Log.d("ID --------------> $id unBookmarked","ID -----------------> $id unBookmarked")
+
+                val deleteIntent = Intent()
+                deleteIntent.action = "deleteMovie"
+                deleteIntent.putExtra("id", id)
+                sendBroadcast(deleteIntent)
             }
         }
 
         backImage.setOnClickListener{
-            val resultIntent = Intent()
+            /*val resultIntent = Intent()
             resultIntent.putExtra("deletedID",id)
             resultIntent.putExtra("deletedFlag",deletedFlag)
-            Log.d("Deleted flag ---------> $deletedFlag","Deleted flag ---------> $deletedFlag")
             setResult(Activity.RESULT_OK,resultIntent)
-            finishActivity(Activity.RESULT_OK)
+            finishActivity(Activity.RESULT_OK)*/
             finish()
         }
     }
@@ -170,13 +171,12 @@ class MovieActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val resultIntent = Intent()
+        /*val resultIntent = Intent()
         resultIntent.putExtra("deletedID",id)
         resultIntent.putExtra("deletedFlag",deletedFlag)
         setResult(Activity.RESULT_OK,resultIntent)
-        finishActivity(Activity.RESULT_OK)
+        finishActivity(Activity.RESULT_OK)*/
         finish()
-
         super.onBackPressed()
     }
 }

@@ -24,6 +24,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -39,10 +40,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.volley)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.recyclerview.selection)
-    implementation(libs.gson)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constraintlayout)
@@ -51,4 +50,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.moshi.kotlin)
     implementation (libs.glide)
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
 }
