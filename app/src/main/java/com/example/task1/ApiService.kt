@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface ApiService {
     @GET("shows")
-    fun getPostById(): Call<List<Movie>>
+    fun getMovieById(): Call<List<Movie>>
 }

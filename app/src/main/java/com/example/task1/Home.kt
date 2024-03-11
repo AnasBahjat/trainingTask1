@@ -104,7 +104,7 @@ class Home : AppCompatActivity() , MovieClicked{
 
     private fun getAllData(){
 
-        val call = ApiClient.apiService.getPostById()
+        val call = ApiClient.apiService.getMovieById()
         call.enqueue(object : Callback<List<Movie>> {
             override fun onResponse(call: Call<List<Movie>>, response: retrofit2.Response<List<Movie>>) {
                 if (response.isSuccessful) {
