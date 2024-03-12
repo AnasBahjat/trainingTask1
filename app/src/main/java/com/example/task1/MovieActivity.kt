@@ -35,12 +35,8 @@ class MovieActivity : AppCompatActivity() {
     private lateinit var categoryLayout : LinearLayout
     private lateinit var movieLanguage : TextView
     private lateinit var summary : TextView
-    private lateinit var sharedPrefManager: SharedPreferences
-    private lateinit var editor : Editor
-    private var deletedFlag = false
-    val bookmarkedList = ArrayList<Movie>()
+    private lateinit var sharedPreferences : SharedPrefManager
     var id : Int = -1
-    var bookmarkFlag = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -51,47 +47,9 @@ class MovieActivity : AppCompatActivity() {
             insets
         }
         wrapViews()
-        wrapDataToViews()
-
-
-
-        if(sharedPrefManager.getInt("$id",0)==0){
-            bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
-        }
-        else {
-            bookmarkImg.setImageResource(R.drawable.filled_bookmark)
-        }
-
-        bookmarkImg.setOnClickListener {
-            if (sharedPrefManager.getInt("$id",0) == 0) {
-                bookmarkImg.setImageResource(R.drawable.filled_bookmark)
-                deletedFlag=false
-                editor.putInt("$id",1).apply()
-
-            } else {
-                bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
-               // editor.putInt("$id",0).apply()
-               // deletedFlag=true
-                editor.remove("$id").apply()
-
-                val deleteIntent = Intent()
-                deleteIntent.action = "deleteMovie"
-                deleteIntent.putExtra("id", id)
-                sendBroadcast(deleteIntent)
-            }
-        }
-
-        backImage.setOnClickListener{
-            /*val resultIntent = Intent()
-            resultIntent.putExtra("deletedID",id)
-            resultIntent.putExtra("deletedFlag",deletedFlag)
-            setResult(Activity.RESULT_OK,resultIntent)
-            finishActivity(Activity.RESULT_OK)*/
-            finish()
-        }
     }
 
-    fun wrapViews(){
+    private fun wrapViews(){
         movieImage=findViewById(R.id.movieImg)
         backImage=findViewById(R.id.backImg)
         bookmarkImg=findViewById(R.id.bookmarkDis)
@@ -101,54 +59,77 @@ class MovieActivity : AppCompatActivity() {
         movieLength=findViewById(R.id.movieLength)
         movieLanguage=findViewById(R.id.movieLanguage)
         summary=findViewById(R.id.summary)
-        sharedPrefManager=getSharedPreferences("taskSharedPreference", Context.MODE_PRIVATE)
-        editor=sharedPrefManager.edit()
+
+        sharedPreferences= SharedPrefManager(this)
+        wrapDataToViews()
+
+
+
+
+        if(sharedPreferences.getMovieSavedStatus(id) == 0){
+            bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
+        }
+
+        else {
+            bookmarkImg.setImageResource(R.drawable.filled_bookmark)
+        }
+
+        bookmarkImg.setOnClickListener {
+            if (sharedPreferences.getMovieSavedStatus(id) == 0) {
+                bookmarkImg.setImageResource(R.drawable.filled_bookmark)
+                sharedPreferences.setMovieSavedStatus(id,1)
+            }
+            else {
+                bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
+                sharedPreferences.removeMovieFromSharedPref(id)
+                val deleteIntent = Intent()
+                deleteIntent.action = "deleteMovie"
+                deleteIntent.putExtra("id", id)
+                sendBroadcast(deleteIntent)
+            }
+        }
+
+        backImage.setOnClickListener {
+            finish()
+        }
     }
 
 
-    fun wrapDataToViews(){
-        id = intent.getIntExtra("id",-1)
+    private fun wrapDataToViews(){
+        val movie = intent.getParcelableExtra<Movie>("movie")
+        if (movie != null) {
+            id=movie.id
+            Glide.with(this)
+                .load(movie.image.medium)
+                .placeholder(R.drawable.loading_icon)
+                .error(R.drawable.baseline_error_24)
+                .into(movieImage)
 
-        Log.d("---------> $id","---------> $id")
-        Glide.with(this)
-            .load(intent.getStringExtra("movieImage"))
-            .placeholder(R.drawable.loading_icon)
-            .error(R.drawable.baseline_error_24)
-            .into(movieImage)
+            movieTitle.text=movie.name
+            rateText.text=getString(R.string.rating,movie.rating.average.toString())
 
-        movieTitle.text=intent.getStringExtra("movieName")
+            val hours = (movie.runtime / 60).toString()
+            val mins = (movie.runtime % 60).toString()
+            movieLength.text=getString(R.string.movieLength,hours,mins)
+            movieLanguage.text=movie.language
+            summary.text=movie.summary
 
-        val rate : Double = intent.getDoubleExtra("rating",0.0)
-
-        rateText.text="$rate/10.0"
-
-        movieLength.text="${intent.getIntExtra("hours",0)}h ${intent.getIntExtra("mins",0)}min"
-
-        movieLanguage.text=intent.getStringExtra("language")
-
-        summary.text=intent.getStringExtra("summary")
-
-        val genres : ArrayList<String>? = intent.getStringArrayListExtra("genres")
-        Log.d("$genres","$genres")
-
-        if(!categoryLayout.isEmpty()){
-            categoryLayout.removeAllViews()
-        }
-
-        if (genres != null) {
-            for (x in genres.indices){
+            if(!categoryLayout.isEmpty()){
+                categoryLayout.removeAllViews()
+            }
+            for (x in movie.genres.indices){
                 val textView = TextView(this)
                 val layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                textView.text = genres[x]
+                textView.text = movie.genres[x]
 
                 var textSize = when {
-                    genres[x].length <= 8 -> 16f
+                    movie.genres[x].length <= 8 -> 16f
                     else -> 12f
                 }
 
-                if(genres[x].length > 13){
+                if(movie.genres[x].length > 13){
                     textView.width = 350
                     textSize=13f
                 }
@@ -166,17 +147,9 @@ class MovieActivity : AppCompatActivity() {
                 textView.background = ContextCompat.getDrawable(this, R.drawable.custom_btn)
                 textView.layoutParams = layoutParams
                 categoryLayout.addView(textView)
+
             }
         }
     }
 
-    override fun onBackPressed() {
-        /*val resultIntent = Intent()
-        resultIntent.putExtra("deletedID",id)
-        resultIntent.putExtra("deletedFlag",deletedFlag)
-        setResult(Activity.RESULT_OK,resultIntent)
-        finishActivity(Activity.RESULT_OK)*/
-        finish()
-        super.onBackPressed()
-    }
 }

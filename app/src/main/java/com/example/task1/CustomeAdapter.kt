@@ -27,7 +27,8 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
 
     }
 
-    @SuppressLint("SetTextI18n", "ResourceAsColor", "SuspiciousIndentation")
+
+
     override fun onBindViewHolder(holder: CustomeAdapter.MyViewHolder, position: Int) {
         val movie = movies[position]
 
@@ -84,12 +85,14 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
         val hours = movie.runtime / 60
         val mins = movie.runtime % 60
 
+
+        //TODO : ("Move to strings file in values")
         holder.movieDuration.text = "${hours}h ${mins}m"
         holder.movieRate.text = "${movie.rating.average}/10.0"
 
 
         val imageUrl =movie.image.medium
-            Glide.with(context)
+        Glide.with(context)
                 .load(imageUrl)
                 .placeholder(R.drawable.loading_icon)
                 .error(R.drawable.baseline_error_24)
