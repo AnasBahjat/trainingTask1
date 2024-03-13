@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isEmpty
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bumptech.glide.Glide
 import org.w3c.dom.Text
 import java.util.ArrayList
@@ -36,6 +37,7 @@ class MovieActivity : AppCompatActivity() {
     private lateinit var movieLanguage : TextView
     private lateinit var summary : TextView
     private lateinit var sharedPreferences : SharedPrefManager
+
     var id : Int = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +68,7 @@ class MovieActivity : AppCompatActivity() {
 
 
 
+
         if(sharedPreferences.getMovieSavedStatus(id) == 0){
             bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
         }
@@ -82,9 +85,9 @@ class MovieActivity : AppCompatActivity() {
             else {
                 bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
                 sharedPreferences.removeMovieFromSharedPref(id)
-                val deleteIntent = Intent()
-                deleteIntent.action = "deleteMovie"
+                val deleteIntent = Intent("deleteMovie")
                 deleteIntent.putExtra("id", id)
+
                 sendBroadcast(deleteIntent)
             }
         }

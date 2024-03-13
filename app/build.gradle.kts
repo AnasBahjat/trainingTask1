@@ -9,12 +9,15 @@ android {
 
     defaultConfig {
         applicationId = "com.example.task1"
-        minSdk = 29
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -34,6 +37,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
 
 }
 
