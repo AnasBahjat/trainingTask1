@@ -69,6 +69,8 @@ class MovieActivity : AppCompatActivity() {
 
 
 
+
+
         if(sharedPreferences.getMovieSavedStatus(id) == 0){
             bookmarkImg.setImageResource(R.drawable.bookmark_disabled)
         }
