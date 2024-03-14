@@ -62,6 +62,7 @@ class MovieActivity : AppCompatActivity() {
             bookmarkImg.setImageResource(R.drawable.filled_bookmark)
         }
 
+
         bookmarkImg.setOnClickListener {
             if (sharedPrefManager.getInt("$id",0) == 0) {
                 bookmarkImg.setImageResource(R.drawable.filled_bookmark)
