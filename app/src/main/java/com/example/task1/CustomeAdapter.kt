@@ -1,29 +1,28 @@
 package com.example.task1
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.flow.combineTransform
+import com.example.task1.databinding.CustomCardViewBinding
 
 class CustomeAdapter(private val movieClickedListener : MovieClicked,private val context : Context, private val movies : List<Movie>) : RecyclerView.Adapter<CustomeAdapter.MyViewHolder>(){
 
 
+    private lateinit var binding : CustomCardViewBinding
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomeAdapter.MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.custom_card_view,parent,false)
-        return MyViewHolder(view)
+        val inflater = LayoutInflater.from(parent.context)
+        binding = CustomCardViewBinding.inflate(inflater,parent,false)
+
+        return MyViewHolder(binding.root)
 
     }
 
@@ -33,17 +32,17 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
         val movie = movies[position]
 
         if(movie.name.length >= 15){
-            holder.movieTitle.textSize=20f
-            val params = holder.movieRate.layoutParams as ViewGroup.MarginLayoutParams
+            binding.movieTitle.textSize=20f
+            val params = binding.movieRate.layoutParams as ViewGroup.MarginLayoutParams
             params.topMargin=200
-            val params1 = holder.rateImg.layoutParams as ViewGroup.MarginLayoutParams
+            val params1 = binding.rateImg.layoutParams as ViewGroup.MarginLayoutParams
             params1.topMargin=200
         }
-        holder.movieTitle.text = movie.name
+        binding.movieTitle.text = movie.name
 
 
-        if (!holder.categLayout.isEmpty()) {
-            holder.categLayout.removeAllViews()
+        if (!binding.categoryLayout.isEmpty()) {
+            binding.categoryLayout.removeAllViews()
         }
 
 
@@ -75,9 +74,9 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
             textView.setTextColor(textColor)
             textView.gravity = Gravity.CENTER
             textView.background = ContextCompat.getDrawable(context, R.drawable.custom_btn)
-            holder.categLayout.addView(textView)
+            binding.categoryLayout.addView(textView)
 
-            holder.movieCardView.setOnClickListener{
+            binding.movieCardView.setOnClickListener{
                 movieClickedListener.onMovieClicked(movie)
             }
         }
@@ -87,8 +86,8 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
 
 
         //TODO : ("Move to strings file in values")
-        holder.movieDuration.text = "${hours}h ${mins}m"
-        holder.movieRate.text = "${movie.rating.average}/10.0"
+        binding.duration.text=context.getString(R.string.movieLength,hours.toString(),mins.toString())
+        binding.movieRate.text= context.getString(R.string.rating,movie.rating.average.toString())
 
 
         val imageUrl =movie.image.medium
@@ -96,7 +95,7 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
                 .load(imageUrl)
                 .placeholder(R.drawable.loading_icon)
                 .error(R.drawable.baseline_error_24)
-                .into(holder.movieImg)
+                .into(binding.movieImage)
     }
 
     override fun getItemCount(): Int {
@@ -104,13 +103,7 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
     }
 
     class MyViewHolder(view : View) : RecyclerView.ViewHolder(view){
-        val movieImg : ImageView = view.findViewById(R.id.movieImage)
-        val rateImg : ImageView = view.findViewById(R.id.rateImg)
-        val movieTitle : TextView = view.findViewById(R.id.movieTitle)
-        val movieRate : TextView = view.findViewById(R.id.movieRate)
-        val movieDuration : TextView = view.findViewById(R.id.duration)
-        val categLayout : LinearLayout = view.findViewById(R.id.categoryLayout)
-        val movieCardView : CardView = view.findViewById(R.id.movieCardView)
+
     }
 
 }

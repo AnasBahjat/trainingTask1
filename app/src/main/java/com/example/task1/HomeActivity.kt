@@ -7,37 +7,39 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.task1.databinding.HomeScreenBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
 import retrofit2.Callback
-
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 
 class HomeActivity : AppCompatActivity() {
     private var moviesList = mutableListOf<Movie>()
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var sharedPreferences : SharedPrefManager
-    private lateinit var bottomNavBar : BottomNavigationView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var myAlertDialog: MyAlertDialog
+    private lateinit var binding :  HomeScreenBinding
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.home_screen)
+        binding = HomeScreenBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         initialize()
     }
 
     private fun initialize(){
-
         wrapViews()
         getAllData()
 
 
 
-        bottomNavBar.setOnItemSelectedListener {
+        binding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.homeMovies -> {
                     loadFragment(HomeFragment())
@@ -57,12 +59,11 @@ class HomeActivity : AppCompatActivity() {
 
 
     private fun wrapViews(){
-        bottomNavBar = findViewById(R.id.bottomNav)!!
         bookmarkedMoviesList= mutableListOf()
         sharedPreferences = SharedPrefManager(this)
-        progressBar = findViewById(R.id.progressBar)
-        progressBar.visibility=View.VISIBLE
-        bottomNavBar.menu.getItem(1).isEnabled = false
+        binding.progressBar.visibility=View.VISIBLE
+        binding.bottomNav.menu.getItem(1).isEnabled = false
+        myAlertDialog = MyAlertDialog(this)
     }
 
 
@@ -76,7 +77,7 @@ class HomeActivity : AppCompatActivity() {
                     val movies = response.body()
                     if (movies != null) {
                         moviesList= movies.toMutableList()
-                        progressBar.visibility=View.GONE
+                        binding.progressBar.visibility=View.GONE
                         loadFragment(HomeFragment())
                     }
                 } else {
@@ -85,9 +86,15 @@ class HomeActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
-                Toast.makeText(this@HomeActivity,"Retrofit error $t",Toast.LENGTH_LONG).show()
-            }
+                binding.progressBar.visibility=View.GONE
 
+                when (t){
+                    is SocketTimeoutException ->  myAlertDialog.showAlertDialog("Connection Error","Connection Timeout , try again later",R.drawable.error_socket_red)
+                    is UnknownHostException -> myAlertDialog.showAlertDialog("Network Error","Please Check your internet connection ..",R.drawable.no_wifi_red)
+                    else -> myAlertDialog.showAlertDialog("Error occurred","There are some problem , please try again later",R.drawable.baseline_error_24)
+                }
+
+            }
         })
     }
 

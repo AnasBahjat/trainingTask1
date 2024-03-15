@@ -8,23 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.task1.databinding.HomeFragmentAllMoviesBinding
 import org.w3c.dom.Text
 import retrofit2.Call
 import retrofit2.Callback
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 class HomeFragment : Fragment(),MovieClicked {
 
     private lateinit var myCustomAdapter: CustomeAdapter
-    private lateinit var recyclerView : RecyclerView
     private var moviesList = mutableListOf<Movie>()
-    private lateinit var emptyTextHomeFragment : TextView
+
+    private lateinit var binding : HomeFragmentAllMoviesBinding
 
     private var param1: String? = null
     private var param2: String? = null
@@ -43,10 +43,9 @@ class HomeFragment : Fragment(),MovieClicked {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val view = inflater.inflate(R.layout.home_fragment_all_movies, container, false)
+        binding = HomeFragmentAllMoviesBinding.inflate(inflater,container,false)
         moviesList = arguments?.getParcelableArrayList("moviesList")!!
-        return view
+        return binding.root
 
     }
 
@@ -58,20 +57,14 @@ class HomeFragment : Fragment(),MovieClicked {
 
 
     private fun initialize(view : View){
-        wrapViews(view)
+        binding.homeFragmentRecView.layoutManager=LinearLayoutManager(context)
         getAllData()
     }
 
-    private fun wrapViews(view : View){
-        recyclerView=view.findViewById(R.id.homeFragmentRecView)
-        emptyTextHomeFragment=view.findViewById(R.id.emptyTextHomeFragment)
-        recyclerView.layoutManager= LinearLayoutManager(context)
-
-    }
 
     private fun getAllData(){
         myCustomAdapter = CustomeAdapter(this@HomeFragment, requireContext(),moviesList)
-        recyclerView.adapter=myCustomAdapter
+        binding.homeFragmentRecView.adapter=myCustomAdapter
     }
 
 

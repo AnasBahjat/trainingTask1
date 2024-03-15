@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.task1.databinding.FragmentBookmarkedMoviesBinding
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -25,12 +26,12 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
 
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var sharedPreferences : SharedPrefManager
-    private lateinit var recyclerView : RecyclerView
-    private lateinit var emptyTextBookmarkedFragment : TextView
+
     private lateinit var myCustomAdapter: CustomeAdapter
     private var moviesList = mutableListOf<Movie>()
-    private lateinit var receiver : BroadcastReceiver
     private lateinit var broadcastReceiver : BroadcastNotifyMovieDeleted
+
+    private lateinit var binding : FragmentBookmarkedMoviesBinding
 
 
 
@@ -47,7 +48,9 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_bookmarked_movies, container, false)
+        binding=FragmentBookmarkedMoviesBinding.inflate(inflater,container,false)
+
+
 
         moviesList = arguments?.getParcelableArrayList("moviesList")!!
         broadcastReceiver = BroadcastNotifyMovieDeleted(this)
@@ -59,7 +62,7 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
             0
         }
         requireActivity().registerReceiver(broadcastReceiver,filter, receiverFlags)
-        return view
+        return binding.root
     }
 
 
@@ -74,19 +77,14 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
     }
 
     private fun initialize(view : View){
-        wrapViews(view)
-        updateBookmarkList()
-    }
-
-    private fun wrapViews(view : View){
-        recyclerView=view.findViewById(R.id.recyclerViewBookmarkedFragment)
-        emptyTextBookmarkedFragment=view.findViewById(R.id.emptyTextBookmarkedFragment)
-        recyclerView.layoutManager= LinearLayoutManager(context)
+        binding.recyclerViewBookmarkedFragment.layoutManager= LinearLayoutManager(context)
         bookmarkedMoviesList= mutableListOf<Movie>()
         if(context != null){
             sharedPreferences = SharedPrefManager(requireContext())
         }
+        updateBookmarkList()
     }
+
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
@@ -110,19 +108,21 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
         }
 
         if(bookmarkedMoviesList.isEmpty()){
-            recyclerView.visibility=View.GONE
-            emptyTextBookmarkedFragment.visibility=View.VISIBLE
+            binding.recyclerViewBookmarkedFragment.visibility=View.GONE
+            binding.emptyTextBookmarkedFragment.visibility=View.VISIBLE
         }
 
         else {
             if(context != null) {
-                recyclerView.visibility = View.VISIBLE
-                emptyTextBookmarkedFragment.visibility = View.GONE
+                binding.recyclerViewBookmarkedFragment.visibility = View.VISIBLE
+                binding.emptyTextBookmarkedFragment.visibility = View.GONE
                 myCustomAdapter = CustomeAdapter(this@BookmarkedMoviesFragment, requireContext(), bookmarkedMoviesList)
-                recyclerView.adapter = myCustomAdapter
+                binding.recyclerViewBookmarkedFragment.adapter = myCustomAdapter
             }
         }
     }
+
+
 
     private fun getMovieData(id : Int) : Movie?{
         var bookmarkedMovie: Movie? = null
@@ -134,6 +134,7 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
         }
         return bookmarkedMovie
     }
+
 
     override fun onMovieClicked(movieData: Movie) {
         val intent = Intent(context,MovieActivity::class.java)
@@ -151,14 +152,14 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
         }
 
         if(bookmarkedMoviesList.isEmpty()){
-            recyclerView.visibility=View.GONE
-            emptyTextBookmarkedFragment.visibility=View.VISIBLE
+            binding.recyclerViewBookmarkedFragment.visibility=View.GONE
+            binding.emptyTextBookmarkedFragment.visibility=View.VISIBLE
         }
         else {
-            recyclerView.visibility = View.VISIBLE
-            emptyTextBookmarkedFragment.visibility = View.GONE
+            binding.recyclerViewBookmarkedFragment.visibility = View.VISIBLE
+            binding.emptyTextBookmarkedFragment.visibility = View.GONE
             myCustomAdapter = CustomeAdapter(this@BookmarkedMoviesFragment, requireContext(), bookmarkedMoviesList)
-            recyclerView.adapter = myCustomAdapter
+            binding.recyclerViewBookmarkedFragment.adapter = myCustomAdapter
         }
     }
 
