@@ -52,17 +52,12 @@ class HomeFragment : Fragment(),MovieClicked {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initialize(view)
+        initialize()
     }
 
 
-    private fun initialize(view : View){
+    private fun initialize(){
         binding.homeFragmentRecView.layoutManager=LinearLayoutManager(context)
-        getAllData()
-    }
-
-
-    private fun getAllData(){
         myCustomAdapter = CustomeAdapter(this@HomeFragment, requireContext(),moviesList)
         binding.homeFragmentRecView.adapter=myCustomAdapter
     }

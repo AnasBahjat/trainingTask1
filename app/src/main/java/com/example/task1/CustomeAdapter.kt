@@ -30,6 +30,7 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
 
     override fun onBindViewHolder(holder: CustomeAdapter.MyViewHolder, position: Int) {
         val movie = movies[position]
+        binding = CustomCardViewBinding.bind(holder.itemView)
 
         if(movie.name.length >= 15){
             binding.movieTitle.textSize=20f
@@ -92,10 +93,10 @@ class CustomeAdapter(private val movieClickedListener : MovieClicked,private val
 
         val imageUrl =movie.image.medium
         Glide.with(context)
-                .load(imageUrl)
-                .placeholder(R.drawable.loading_icon)
-                .error(R.drawable.baseline_error_24)
-                .into(binding.movieImage)
+            .load(imageUrl)
+            .placeholder(R.drawable.loading_icon)
+            .error(R.drawable.baseline_error_24)
+            .into(binding.movieImage)
     }
 
     override fun getItemCount(): Int {
