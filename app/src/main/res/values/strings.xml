@@ -7,4 +7,17 @@
     <string name="emptyBookmarkedMovies">No Bookmarked Movies</string>
     <string name="allMovies">All Movies</string>
     <string name="bookmarkedMovies">Bookmarked Movies</string>
+    <string name="quit">Quit</string>
+    <string name="titleText">Title</string>
+    <string name="rateText">Rate</string>
+    <string name="lengthText">Length</string>
+    <string name="languageText">Language</string>
+    <string name="hoursMinutesText">h  min</string>
+    <string name="descriptionText">Description</string>
+    <string name="summaryText">Summary</string>
+    <string name="movie_image">Movie image</string>
+    <string name="back_button">Back Button</string>
+    <string name="bookmark_image">Bookmark Image</string>
+    <string name="rate_image">Rate Image</string>
+    <string name="length_image">Length Image</string>
 </resources>

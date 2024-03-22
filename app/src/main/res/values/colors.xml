@@ -4,4 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lightBlue">#DAE2FE</color>
     <color name="textColor">#87A3E7</color>
+    <color name="languageAndLengthTextColor">#9B9B9B</color>
+    <color name="noMoviesToViewText">#4C4A4A</color>
+
+
 </resources>

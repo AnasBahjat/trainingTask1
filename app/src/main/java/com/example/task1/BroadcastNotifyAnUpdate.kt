@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-class BroadcastNotifyMovieDeleted(private val listener : BroadcastReceiverListener): BroadcastReceiver() {
+class BroadcastNotifyAnUpdate(private val listener : BroadcastReceiverListener): BroadcastReceiver() {
     interface BroadcastReceiverListener{
         fun onBroadcastReceived(id : Int)
     }

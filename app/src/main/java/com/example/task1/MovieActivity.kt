@@ -1,17 +1,8 @@
 package com.example.task1
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
-import android.view.View
-import android.view.animation.CycleInterpolator
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -20,16 +11,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isEmpty
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bumptech.glide.Glide
 import com.example.task1.databinding.ActivityMovieBinding
-import org.w3c.dom.Text
-import java.util.ArrayList
 
 class MovieActivity : AppCompatActivity() {
 
     private lateinit var sharedPreferences : SharedPrefManager
     private lateinit var binding : ActivityMovieBinding
+
 
     var id : Int = -1
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +37,8 @@ class MovieActivity : AppCompatActivity() {
 
     private fun wrapViews(){
         sharedPreferences= SharedPrefManager(this)
-        wrapDataToViews()
+        val movie = intent.getParcelableExtra<Movie>("movie")
+        wrapDataToViews(movie)
         if(sharedPreferences.getMovieSavedStatus(id) == 0){
             binding.bookmarkDis.setImageResource(R.drawable.bookmark_disabled)
         }
@@ -60,14 +50,13 @@ class MovieActivity : AppCompatActivity() {
         binding.bookmarkDis.setOnClickListener {
             if (sharedPreferences.getMovieSavedStatus(id) == 0) {
                 binding.bookmarkDis.setImageResource(R.drawable.filled_bookmark)
-                sharedPreferences.setMovieSavedStatus(id,1)
+                sharedPreferences.addIdToList(id)
             }
             else {
                 binding.bookmarkDis.setImageResource(R.drawable.bookmark_disabled)
-                sharedPreferences.removeMovieFromSharedPref(id)
+                sharedPreferences.removeIdFromList(id)
                 val deleteIntent = Intent("deleteMovie")
                 deleteIntent.putExtra("id", id)
-
                 sendBroadcast(deleteIntent)
             }
         }
@@ -78,8 +67,7 @@ class MovieActivity : AppCompatActivity() {
     }
 
 
-    private fun wrapDataToViews(){
-        val movie = intent.getParcelableExtra<Movie>("movie")
+    private fun wrapDataToViews(movie : Movie?){
         if (movie != null) {
             id=movie.id
             Glide.with(this)

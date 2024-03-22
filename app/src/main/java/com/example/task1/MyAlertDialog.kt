@@ -1,19 +1,20 @@
 package com.example.task1
 
 import android.content.Context
-import android.content.DialogInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import kotlin.system.exitProcess
 
-class MyAlertDialog(private val context : Context) {
+class MyAlertDialog(private val context : Context, private val stopTheApp: StopTheApp) {
+
+    private var stopAppListener : StopTheApp? = null
     fun showAlertDialog(title : String , msg : String, iconId : Int) {
+        stopAppListener=stopTheApp
         val alterDialog = MaterialAlertDialogBuilder(context)
             .setTitle(title)
             .setIcon(iconId)
             .setMessage(msg)
-            .setNegativeButton("Quit"){ dialog,which ->
-                exitProcess(0)
+            .setNegativeButton(context.getString(R.string.quit)){ dialog,which ->
+               // exitProcess(0)
+                stopAppListener?.stopApp()
             }
             .setCancelable(false)
 

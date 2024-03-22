@@ -1,6 +1,5 @@
 package com.example.task1
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -11,35 +10,28 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.task1.databinding.FragmentBookmarkedMoviesBinding
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyAnUpdate.BroadcastReceiverListener {
 
-class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDeleted.BroadcastReceiverListener {
-
-    private var param1: String? = null
-    private var param2: String? = null
 
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var sharedPreferences : SharedPrefManager
 
     private lateinit var myCustomAdapter: CustomeAdapter
     private var moviesList = mutableListOf<Movie>()
-    private lateinit var broadcastReceiver : BroadcastNotifyMovieDeleted
+    private lateinit var broadcastReceiver : BroadcastNotifyAnUpdate
 
-    private lateinit var binding : FragmentBookmarkedMoviesBinding
+    private var _binding : FragmentBookmarkedMoviesBinding? = null
+    private val binding get() = _binding!!
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+
         }
 
     }
@@ -47,36 +39,38 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding=FragmentBookmarkedMoviesBinding.inflate(inflater,container,false)
+    ): View {
+        _binding = FragmentBookmarkedMoviesBinding.inflate(inflater, container, false)
 
 
 
         moviesList = arguments?.getParcelableArrayList("moviesList")!!
-        broadcastReceiver = BroadcastNotifyMovieDeleted(this)
+        broadcastReceiver = BroadcastNotifyAnUpdate(this)
         val filter = IntentFilter("deleteMovie")
-        val receiverFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+        val receiverFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Context.RECEIVER_NOT_EXPORTED
-        }
-        else {
+        } else {
             0
         }
-        requireActivity().registerReceiver(broadcastReceiver,filter, receiverFlags)
+        if(activity != null){
+            requireActivity().registerReceiver(broadcastReceiver, filter, receiverFlags)
+        }
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initialize(view)
+        initialize()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        requireActivity().unregisterReceiver(broadcastReceiver)
+        if(activity != null)
+            requireActivity().unregisterReceiver(broadcastReceiver)
     }
 
-    private fun initialize(view : View){
+    private fun initialize(){
         binding.recyclerViewBookmarkedFragment.layoutManager= LinearLayoutManager(context)
         bookmarkedMoviesList= mutableListOf<Movie>()
         if(context != null){
@@ -85,23 +79,12 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
         updateBookmarkList()
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BookmarkedMoviesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
-
     private fun updateBookmarkList(){
         bookmarkedMoviesList = mutableListOf()
-        val myKeys=sharedPreferences.getAllKeys()
-        Log.d("----------> $myKeys","----------> $myKeys")
-        for (key in myKeys){
-            val movie = getMovieData(key)
+        val moviesIDs=sharedPreferences.getIdsList()
+
+        for(id in moviesIDs){
+            val movie = getMovieData(id)
             if (movie != null) {
                 bookmarkedMoviesList.add(movie)
             }
@@ -169,3 +152,4 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyMovieDel
     }
 
 }
+

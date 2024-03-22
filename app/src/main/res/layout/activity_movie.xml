@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context=".MovieActivity">
 
         <ImageView
@@ -17,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             app:srcCompat="@drawable/loading_icon"
-            android:scaleType="fitXY" />
+            android:scaleType="fitXY"
+            android:contentDescription="@string/movie_image" />
 
         <ImageView
             android:id="@+id/backImg"
@@ -25,7 +26,8 @@
             android:layout_height="38dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
-            app:srcCompat="@drawable/back_arrow"/>
+            app:srcCompat="@drawable/back_arrow"
+            android:contentDescription="@string/back_button" />
 
         <RelativeLayout
             android:id="@+id/descLayout"
@@ -40,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="20dp"
-                android:text="Title"
+                android:text="@string/titleText"
                 android:textSize="28sp" />
 
             <ImageView
@@ -49,7 +51,8 @@
                 android:layout_height="35dp"
                 android:layout_marginStart="350dp"
                 android:layout_marginTop="20dp"
-                app:srcCompat="@drawable/bookmark_disabled" />
+                app:srcCompat="@drawable/bookmark_disabled"
+                android:contentDescription="@string/bookmark_image" />
 
             <TextView
                 android:id="@+id/rateText"
@@ -58,7 +61,7 @@
                 android:layout_below="@+id/movieName"
                 android:layout_marginStart="62dp"
                 android:layout_marginTop="29dp"
-                android:text="Rate"
+                android:text="@string/rateText"
                 android:textSize="17sp" />
 
             <ImageView
@@ -68,7 +71,8 @@
                 android:layout_below="@+id/movieName"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="23dp"
-                app:srcCompat="@drawable/rating_icon" />
+                app:srcCompat="@drawable/rating_icon"
+                android:contentDescription="@string/rate_image" />
 
             <ScrollView
                 android:id="@+id/scrollView2"
@@ -93,8 +97,8 @@
                 android:layout_below="@+id/scrollView2"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="48dp"
-                android:text="Length"
-                android:textColor="#9B9B9B"
+                android:text="@string/lengthText"
+                android:textColor="@color/languageAndLengthTextColor"
                 android:textSize="22sp" />
 
             <TextView
@@ -104,8 +108,8 @@
                 android:layout_below="@+id/scrollView2"
                 android:layout_marginStart="200dp"
                 android:layout_marginTop="48dp"
-                android:text="Language"
-                android:textColor="#9B9B9B"
+                android:text="@string/languageText"
+                android:textColor="@color/languageAndLengthTextColor"
                 android:textSize="22sp" />
 
             <TextView
@@ -115,7 +119,7 @@
                 android:layout_below="@+id/textView4"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="10dp"
-                android:text="h  min"
+                android:text="@string/hoursMinutesText"
                 android:textSize="22sp" />
 
             <TextView
@@ -134,7 +138,7 @@
                 android:layout_below="@+id/movieLength"
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="20dp"
-                android:text="Description"
+                android:text="@string/descriptionText"
                 android:textAlignment="center"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -148,8 +152,8 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="30dp"
-                android:text="Summary"
-                android:textColor="#9B9B9B"
+                android:text="@string/summaryText"
+                android:textColor="@color/languageAndLengthTextColor"
                 android:textSize="20sp" />
         </RelativeLayout>
 
