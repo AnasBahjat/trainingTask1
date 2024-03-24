@@ -35,7 +35,7 @@
         android:background="#FDF6FE"
         android:paddingStart="15dp"
         android:scrollIndicators="left"
-        app:itemIconSize="30dp"
+        app:itemIconSize="35dp"
         app:itemIconTint="@color/icons_focus_colors"
         app:menu="@menu/nav_bar_menu">
 
@@ -47,9 +47,10 @@
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="170dp"
-        android:layout_marginTop="330dp"
-        android:layout_marginBottom="330dp"
+        android:layout_marginLeft="180dp"
+        android:layout_marginTop="300dp"
+        android:layout_marginBottom="350dp"
+        android:layout_centerHorizontal="true"
         android:visibility="visible" />
 
 </RelativeLayout>

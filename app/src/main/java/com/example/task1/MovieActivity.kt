@@ -1,6 +1,7 @@
 package com.example.task1
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -37,7 +38,13 @@ class MovieActivity : AppCompatActivity() {
 
     private fun wrapViews(){
         sharedPreferences= SharedPrefManager(this)
-        val movie = intent.getParcelableExtra<Movie>("movie")
+
+        val movie = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            intent.getParcelableExtra(Constants.MOVIE_KEY,Movie::class.java)
+        }
+        else {
+            intent.getParcelableExtra(Constants.MOVIE_KEY)
+        }
         wrapDataToViews(movie)
         if(sharedPreferences.getMovieSavedStatus(id) == 0){
             binding.bookmarkDis.setImageResource(R.drawable.bookmark_disabled)
@@ -55,8 +62,8 @@ class MovieActivity : AppCompatActivity() {
             else {
                 binding.bookmarkDis.setImageResource(R.drawable.bookmark_disabled)
                 sharedPreferences.removeIdFromList(id)
-                val deleteIntent = Intent("deleteMovie")
-                deleteIntent.putExtra("id", id)
+                val deleteIntent = Intent(Constants.DELETE_MOVIE_ACTION)
+                deleteIntent.putExtra(Constants.ID_TO_SAVE, id)
                 sendBroadcast(deleteIntent)
             }
         }

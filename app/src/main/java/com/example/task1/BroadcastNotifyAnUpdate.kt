@@ -9,8 +9,8 @@ class BroadcastNotifyAnUpdate(private val listener : BroadcastReceiverListener):
         fun onBroadcastReceived(id : Int)
     }
     override fun onReceive(context: Context?, intent: Intent?) {
-        if(intent?.action == "deleteMovie"){
-            val id = intent.getIntExtra("id",-5)
+        if(intent?.action == Constants.DELETE_MOVIE_ACTION){
+            val id = intent.getIntExtra(Constants.ID_TO_SAVE,-5)
             listener.onBroadcastReceived(id)
         }
     }

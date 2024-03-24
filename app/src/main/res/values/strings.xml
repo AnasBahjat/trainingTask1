@@ -20,4 +20,5 @@
     <string name="bookmark_image">Bookmark Image</string>
     <string name="rate_image">Rate Image</string>
     <string name="length_image">Length Image</string>
+    <string name="loadingText">Loading Data …</string>
 </resources>

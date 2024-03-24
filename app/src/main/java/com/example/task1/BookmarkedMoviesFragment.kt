@@ -20,7 +20,7 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyAnUpdate
     private lateinit var sharedPreferences : SharedPrefManager
 
     private lateinit var myCustomAdapter: CustomeAdapter
-    private var moviesList = mutableListOf<Movie>()
+    private var moviesList : MutableList<Movie>? = mutableListOf<Movie>()
     private lateinit var broadcastReceiver : BroadcastNotifyAnUpdate
 
     private var _binding : FragmentBookmarkedMoviesBinding? = null
@@ -44,9 +44,13 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyAnUpdate
 
 
 
-        moviesList = arguments?.getParcelableArrayList("moviesList")!!
+        moviesList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            arguments?.getParcelableArrayList(Constants.MOVIES_LIST,Movie::class.java)
+        } else {
+            arguments?.getParcelableArrayList(Constants.MOVIES_LIST)
+        }
         broadcastReceiver = BroadcastNotifyAnUpdate(this)
-        val filter = IntentFilter("deleteMovie")
+        val filter = IntentFilter(Constants.DELETE_MOVIE_ACTION)
         val receiverFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Context.RECEIVER_NOT_EXPORTED
         } else {
@@ -109,10 +113,12 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyAnUpdate
 
     private fun getMovieData(id : Int) : Movie?{
         var bookmarkedMovie: Movie? = null
-        for (movie in moviesList){
-            if(movie.id == id){
-                bookmarkedMovie=movie
-                break
+        moviesList?.let{moviesList->
+            for (movie in moviesList){
+                if(movie.id == id){
+                    bookmarkedMovie=movie
+                    break
+                }
             }
         }
         return bookmarkedMovie
@@ -121,14 +127,12 @@ class BookmarkedMoviesFragment : Fragment(),MovieClicked,BroadcastNotifyAnUpdate
 
     override fun onMovieClicked(movieData: Movie) {
         val intent = Intent(context,MovieActivity::class.java)
-        intent.putExtra("movie",movieData)
+        intent.putExtra(Constants.MOVIE_KEY,movieData)
         startActivity(intent)
     }
 
 
-
     private fun deleteMovie(id : Int){
-        Log.d("Movie deleted -----> $id","Movie deleted -----> $id")
         val movieToDelete=getMovieData(id)
         if (bookmarkedMoviesList.isNotEmpty()) {
             bookmarkedMoviesList.remove(movieToDelete)

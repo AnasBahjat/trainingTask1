@@ -1,6 +1,7 @@
 package com.example.task1
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -33,7 +34,12 @@ class HomeFragment : Fragment(),MovieClicked {
         savedInstanceState: Bundle?
     ): View {
         _binding = HomeFragmentAllMoviesBinding.inflate(inflater,container,false)
-        moviesList = arguments?.getParcelableArrayList("moviesList")!!
+
+        moviesList = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            arguments?.getParcelableArrayList(Constants.MOVIES_LIST,Movie::class.java)!!
+        } else {
+            arguments?.getParcelableArrayList(Constants.MOVIES_LIST)!!
+        }
         return binding.root
 
     }
@@ -57,7 +63,7 @@ class HomeFragment : Fragment(),MovieClicked {
 
     override fun onMovieClicked(movieData : Movie) {
         val intent = Intent(context,MovieActivity::class.java)
-        intent.putExtra("movie",movieData)
+        intent.putExtra(Constants.MOVIE_KEY,movieData)
         startActivity(intent)
     }
 }

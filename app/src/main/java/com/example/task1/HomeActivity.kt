@@ -60,7 +60,7 @@ class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
 
     private fun loadFragment(fragment : Fragment){
         val bundle = Bundle().apply {
-            putParcelableArrayList("moviesList", ArrayList(moviesList))
+            putParcelableArrayList(Constants.MOVIES_LIST, ArrayList(moviesList))
         }
         fragment.arguments = bundle
         val transaction = supportFragmentManager.beginTransaction()
