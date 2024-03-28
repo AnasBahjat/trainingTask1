@@ -14,16 +14,6 @@ class SharedPrefManager (private val context : Context){
         return 0
     }
 
-    fun setMovieSavedStatus(id : Int,value : Int){
-            val editor=sharedPreferences.edit()
-            editor.putInt("$id",value).apply()
-    }
-
-    fun removeMovieFromSharedPref(id : Int){
-        val editor=sharedPreferences.edit()
-        editor.remove("$id").apply()
-    }
-
     fun getIdsList() : MutableList<Int>{
         val arrayData = sharedPreferences.getString("IDsArray","")
         val st = StringTokenizer(arrayData,",")
@@ -47,15 +37,5 @@ class SharedPrefManager (private val context : Context){
         list.remove(id)
         val updatedListString = list.joinToString(",")
         sharedPreferences.edit().putString("IDsArray",updatedListString).apply()
-    }
-
-    fun getAllKeys() : MutableList<Int>{
-        val allKeysList : MutableList<Int> = mutableListOf()
-        for ( key in sharedPreferences.all.keys){
-            if(key.toIntOrNull() != null){
-                allKeysList.add(key.toInt())
-            }
-        }
-        return allKeysList
     }
 }

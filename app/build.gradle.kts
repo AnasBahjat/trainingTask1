@@ -58,4 +58,6 @@ dependencies {
     implementation (libs.glide)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 }

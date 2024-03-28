@@ -6,15 +6,16 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.task1.databinding.HomeScreenBinding
 
-class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
+class HomeActivity : AppCompatActivity() {
     private var moviesList = mutableListOf<Movie>()
     private lateinit var bookmarkedMoviesList : MutableList<Movie>
     private lateinit var sharedPreferences : SharedPrefManager
-    private lateinit var myAlertDialog: MyAlertDialog
     private lateinit var binding :  HomeScreenBinding
-    private lateinit var readServerData : GetDataFromServer
+    private lateinit var viewModel: MyViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,11 @@ class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
     private fun initialize(){
         wrapViews()
 
-        readServerData.getAllData()
+        viewModel.readDataFromAPI()
+        viewModel.returnApiData().observe(this, Observer{ allMovies ->
+            moviesList=allMovies
+            loadFragment(HomeFragment())
+        })
 
         binding.bottomNav.setOnItemSelectedListener {
             when(it.itemId){
@@ -38,6 +43,7 @@ class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
                 true}
                 R.id.bookmarkMovies ->{
                     loadFragment(BookmarkedMoviesFragment())
+                    binding.progressBar.visibility=View.GONE
                     true
                 }
                 else -> {
@@ -53,12 +59,12 @@ class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
         sharedPreferences = SharedPrefManager(this)
         binding.progressBar.visibility=View.VISIBLE
         binding.bottomNav.menu.getItem(1).isEnabled = false
-        myAlertDialog = MyAlertDialog(this,this)
-        readServerData = GetDataFromServer(this,this,this)
+        viewModel = ViewModelProvider(this)[MyViewModel::class.java]
     }
 
 
     private fun loadFragment(fragment : Fragment){
+        binding.progressBar.visibility=View.GONE
         val bundle = Bundle().apply {
             putParcelableArrayList(Constants.MOVIES_LIST, ArrayList(moviesList))
         }
@@ -67,17 +73,4 @@ class HomeActivity : AppCompatActivity(),DataIsReady,StopTheApp {
         transaction.replace(R.id.fragmentsContainer,fragment)
         transaction.commit()
     }
-
-    override fun dataReadyToBeDisplayed(movies: MutableList<Movie>) {
-        binding.progressBar.visibility=View.GONE
-        moviesList=movies
-        loadFragment(HomeFragment())
-    }
-
-    override fun stopApp() {
-        finish()
-    }
-}
-interface StopTheApp{
-    fun stopApp()
 }
