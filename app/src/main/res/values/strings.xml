@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">task1</string>
+    <string name="rating">%s / 10.0</string>
+    <string name="movieLength">%sh %sm</string>
+    <string name="mrMovieText">MRMovie</string>
+    <string name="emptyHomeMovies">No Movies To View</string>
+    <string name="emptyBookmarkedMovies">No Bookmarked Movies</string>
+    <string name="allMovies">All Movies</string>
+    <string name="bookmarkedMovies">Bookmarked Movies</string>
+    <string name="quit">Quit</string>
+    <string name="titleText">Title</string>
+    <string name="rateText">Rate</string>
+    <string name="lengthText">Length</string>
+    <string name="languageText">Language</string>
+    <string name="hoursMinutesText">h  min</string>
+    <string name="descriptionText">Description</string>
+    <string name="summaryText">Summary</string>
+    <string name="movie_image">Movie image</string>
+    <string name="back_button">Back Button</string>
+    <string name="bookmark_image">Bookmark Image</string>
+    <string name="rate_image">Rate Image</string>
+    <string name="length_image">Length Image</string>
+    <string name="loadingText">Loading Data …</string>
 </resources>

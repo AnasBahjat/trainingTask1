@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="59dp"
-        android:text="TextView"
+        android:text="@string/rateText"
         android:textSize="17sp"
         android:layout_marginStart="175dp" />
 
@@ -18,14 +18,15 @@
         android:layout_width="125dp"
         android:layout_height="200dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"
+        android:contentDescription="@string/movie_image" />
 
     <TextView
         android:id="@+id/movieTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Rating"
+        android:text="@string/titleText"
         android:textSize="23sp"
         android:layout_marginStart="143dp"/>
 
@@ -35,7 +36,8 @@
         android:layout_height="25dp"
         android:layout_marginTop="57dp"
         android:layout_marginStart="143dp"
-        android:src="@drawable/rating_icon"/>
+        android:src="@drawable/rating_icon"
+        android:contentDescription="@string/rate_image" />
 
 
     <ImageView
@@ -44,13 +46,14 @@
         android:layout_height="30dp"
         android:src="@drawable/baseline_access_time_24"
         android:layout_marginTop="150dp"
-        android:layout_marginStart="143dp"/>
+        android:layout_marginStart="143dp"
+        android:contentDescription="@string/length_image" />
 
     <TextView
         android:id="@+id/duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="@string/lengthText"
         android:textSize="17sp"
         android:layout_marginTop="155dp"
         android:layout_marginStart="175dp"/>
@@ -67,15 +70,16 @@
             android:id="@+id/categoryLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:orientation="horizontal"></LinearLayout>
+            android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="7dp"
         android:layout_marginTop="200dp"
-        android:orientation="horizontal"></LinearLayout>
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
+        android:orientation="horizontal" />
 
 
 </androidx.cardview.widget.CardView>
